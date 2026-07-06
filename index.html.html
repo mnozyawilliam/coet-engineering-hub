@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoET Engineering Hub — University of Dar es Salaam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#061a3a;
+    --navy-deep:#040f24;
+    --blue:#003b7a;
+    --blue-light:#0b6fb3;
+    --gold:#f5b335;
+    --gold-soft:#ffe6a3;
+    --paper:#f4f7fb;
+    --card:#ffffff;
+    --ink:#162033;
+    --muted:#64748b;
+    --line:#e3e9f4;
+    --green:#3f8a5f;
+    --radius:18px;
+    --radius-sm:10px;
+    --shadow:0 18px 46px rgba(6,26,58,.10);
+    --shadow-lg:0 26px 64px rgba(6,26,58,.16);
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important; scroll-behavior:auto !important;}
+  }
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+  :focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .icon{width:18px;height:18px;display:block;flex:none;}
+
+  /* ---------- App shell ---------- */
+  .app{display:flex; min-height:100vh;}
+  .main{flex:1; min-width:0; display:flex; flex-direction:column;}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:264px;
+    flex:none;
+    background:linear-gradient(190deg, var(--navy) 0%, var(--navy-deep) 100%);
+    position:relative;
+    overflow:hidden;
+    color:var(--gold-soft);
+    display:flex;
+    flex-direction:column;
+    position:sticky;
+    top:0;
+    height:100vh;
+    z-index:40;
+  }
+  .sidebar::before{
+    content:''; position:absolute; inset:0; opacity:.5; pointer-events:none;
+    background-image:
+      repeating-linear-gradient(52deg, rgba(255,255,255,.035) 0 1.5px, transparent 1.5px 30px),
+      repeating-linear-gradient(-52deg, rgba(255,255,255,.035) 0 1.5px, transparent 1.5px 30px);
+  }
+  .sidebar::after{
+    content:''; position:absolute; width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(245,179,53,.16), transparent 70%);
+    right:-90px; bottom:-100px; pointer-events:none;
+  }
+  .sidebar > *{position:relative; z-index:1;}
+  .sidebar-scroll{overflow-y:auto; flex:1; display:flex; flex-direction:column;}
+
+  .brand{padding:1.5rem 1.3rem 1.2rem; display:flex; align-items:center; gap:.75rem; border-bottom:1px solid rgba(255,255,255,0.1);}
+  .crest{
+    width:46px; height:46px; border-radius:50%; flex:none;
+    background:var(--card); color:var(--blue); display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; font-size:.72rem; letter-spacing:.02em;
+    border:3px solid var(--gold);
+  }
+  .brand-text h1{font-family:var(--font-display); font-size:1.08rem; font-weight:700; margin:0; color:#fff; line-height:1.25;}
+  .brand-text p{margin:.2rem 0 0; font-size:.68rem; color:var(--gold-soft); letter-spacing:.03em; opacity:.85;}
+
+  nav.primary{padding:.85rem .65rem;}
+  .nav-group-label{
+    font-family:var(--font-mono); font-size:.6rem; letter-spacing:.14em;
+    color:rgba(255,230,163,0.4); text-transform:uppercase; padding:.9rem .65rem .35rem;
+  }
+  .nav-btn{
+    width:100%; display:flex; align-items:center; gap:.7rem;
+    background:transparent; border:none; color:rgba(255,255,255,.82);
+    padding:.62rem .7rem; margin:.08rem 0; border-radius:var(--radius-sm);
+    font-size:.87rem; text-align:left; position:relative;
+    border-left:3px solid transparent;
+  }
+  .nav-btn .icon{color:rgba(255,255,255,.5);}
+  .nav-btn:hover{background:rgba(255,255,255,0.07);}
+  .nav-btn.active{
+    background:rgba(245,179,53,0.14);
+    border-left:3px solid var(--gold);
+    color:#fff; font-weight:600;
+  }
+  .nav-btn.active .icon{color:var(--gold);}
+  .sidebar-foot{
+    padding:1rem 1.3rem 1.3rem; border-top:1px solid rgba(255,255,255,0.1);
+    font-family:var(--font-mono); font-size:.63rem; color:rgba(255,230,163,0.55);
+    letter-spacing:.05em; line-height:1.7;
+  }
+  .sidebar-foot strong{color:var(--gold-soft);}
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex; align-items:center; gap:1rem;
+    padding:1rem 1.9rem; border-bottom:1px solid var(--line);
+    background:rgba(244,247,251,0.9); backdrop-filter:blur(8px);
+    position:sticky; top:0; z-index:20;
+  }
+  .menu-toggle{display:none; background:#fff; border:1px solid var(--line); border-radius:var(--radius-sm); padding:.45rem; color:var(--navy);}
+  .sheet-label{
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.1em;
+    color:var(--blue-light); text-transform:uppercase; white-space:nowrap; font-weight:500;
+  }
+  .topbar .divider{width:1px; height:20px; background:var(--line);}
+  .search-box{
+    flex:1; max-width:360px; display:flex; align-items:center; gap:.5rem;
+    background:#fff; border:1px solid var(--line); border-radius:999px;
+    padding:.5rem .9rem; color:var(--muted);
+  }
+  .search-box input{border:none; background:none; outline:none; font-family:var(--font-body); font-size:.85rem; width:100%; color:var(--ink);}
+  .topbar-right{margin-left:auto; display:flex; align-items:center; gap:1.1rem;}
+  .bell-wrap{position:relative; color:var(--muted);}
+  .bell-dot{position:absolute; top:-2px; right:-2px; width:7px; height:7px; background:var(--gold); border-radius:50%; border:1.5px solid var(--paper);}
+  .avatar{
+    width:34px; height:34px; border-radius:50%; background:var(--blue); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-display);
+    font-size:.75rem; font-weight:700; flex:none; border:2px solid var(--gold);
+  }
+
+  /* ---------- Content area ---------- */
+  .content{padding:2.1rem 2.4rem 2.5rem; flex:1;}
+  .view{display:none;}
+  .view.active{display:block; animation:fadein .3s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .eyebrow{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; color:var(--blue-light); text-transform:uppercase; margin:0 0 .5rem; font-weight:500;}
+  h2.view-title{font-family:var(--font-display); font-size:2rem; font-weight:700; margin:0 0 .35rem; letter-spacing:-.02em; color:var(--navy);}
+  .view-sub{color:var(--muted); font-size:.97rem; margin:0; max-width:64ch; line-height:1.55;}
+
+  /* Section divider — pill style */
+  .section-divider{display:flex; align-items:center; gap:1rem; margin:2.4rem 0 1.4rem;}
+  .section-divider .line{flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--line));}
+  .section-divider .line.right{background:linear-gradient(90deg, var(--line), transparent);}
+  .section-divider .label{
+    font-family:var(--font-mono); font-size:.66rem; letter-spacing:.12em; color:var(--blue-light);
+    text-transform:uppercase; white-space:nowrap; padding:.3rem .85rem; border:1px solid var(--line);
+    border-radius:999px; background:#fff;
+  }
+
+  /* Course code badge */
+  .stamp{
+    display:inline-block; background:linear-gradient(135deg, var(--gold), #ffd977); color:var(--navy);
+    font-family:var(--font-display); font-weight:700; padding:.28rem .75rem; border-radius:8px;
+    font-size:.78rem; letter-spacing:.02em;
+  }
+
+  /* Hero band (Home) */
+  .hero-band{
+    position:relative; overflow:hidden; border-radius:24px; color:#fff; padding:2.2rem 2.2rem;
+    background:
+      radial-gradient(circle at 88% 15%, rgba(245,179,53,.4), transparent 42%),
+      radial-gradient(circle at 6% 95%, rgba(11,111,179,.55), transparent 40%),
+      linear-gradient(135deg, var(--navy) 0%, var(--blue) 62%, #075a8f 100%);
+    box-shadow:var(--shadow-lg);
+  }
+  .hero-band::before{
+    content:''; position:absolute; inset:0; opacity:.5; pointer-events:none;
+    background-image:
+      repeating-linear-gradient(48deg, rgba(255,255,255,.05) 0 1.5px, transparent 1.5px 30px),
+      repeating-linear-gradient(-48deg, rgba(255,255,255,.05) 0 1.5px, transparent 1.5px 30px);
+  }
+  .hero-inner{position:relative; z-index:1; display:flex; justify-content:space-between; gap:2rem; flex-wrap:wrap; align-items:flex-end;}
+  .hero-badge{display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); padding:.4rem .85rem; border-radius:999px; font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; color:var(--gold-soft); font-weight:600;}
+  .hero-band h2{font-family:var(--font-display); font-size:2.1rem; margin:.9rem 0 .5rem; font-weight:700; letter-spacing:-.02em; color:#fff;}
+  .hero-band p.lead{color:#dcecff; max-width:46ch; font-size:.98rem; line-height:1.6; margin:0;}
+  .hero-stats{display:flex; gap:.9rem; flex-wrap:wrap;}
+  .hero-stat{background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:14px; padding:.8rem 1.2rem; text-align:center; min-width:96px;}
+  .hero-stat strong{display:block; font-family:var(--font-display); font-size:1.3rem; color:var(--gold-soft);}
+  .hero-stat span{font-size:.68rem; color:#dcecff; letter-spacing:.03em;}
+
+  /* Cards */
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:1.2rem 1.3rem; box-shadow:var(--shadow); transition:transform .18s ease, box-shadow .18s ease;}
+  .grid{display:grid; gap:1.1rem;}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  @media (max-width:1000px){ .grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:640px){ .grid-4,.grid-3,.grid-2{grid-template-columns:1fr;} }
+
+  .btn{display:inline-flex; align-items:center; gap:.45rem; border-radius:999px; font-size:.83rem; font-weight:600; padding:.6rem 1.15rem; border:1px solid transparent;}
+  .btn-primary{background:var(--navy); color:#fff;}
+  .btn-primary:hover{background:var(--blue);}
+  .btn-accent{background:linear-gradient(135deg, var(--gold), #ffd977); color:var(--navy);}
+  .btn-accent:hover{filter:brightness(1.04);}
+  .btn-ghost{background:#fff; border-color:var(--line); color:var(--navy);}
+  .btn-ghost:hover{border-color:var(--blue-light); color:var(--blue-light);}
+  .btn:disabled{opacity:.6; cursor:default;}
+
+  /* ---------- HOME ---------- */
+  .stat-card{display:flex; flex-direction:column; gap:.3rem;}
+  .stat-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg);}
+  .stat-card .label{font-family:var(--font-mono); font-size:.64rem; letter-spacing:.1em; color:var(--muted); text-transform:uppercase;}
+  .stat-card .value{font-family:var(--font-display); font-size:1.55rem; font-weight:700; color:var(--navy);}
+  .stat-card .sub{font-size:.78rem; color:var(--muted);}
+
+  .schedule-item{display:flex; gap:1rem; align-items:flex-start; padding:.85rem 0; border-bottom:1px solid var(--line);}
+  .schedule-item:last-child{border-bottom:none;}
+  .time-chip{font-family:var(--font-mono); font-size:.72rem; color:var(--blue); background:rgba(11,111,179,0.08); padding:.25rem .55rem; border-radius:999px; white-space:nowrap; flex:none;}
+  .schedule-item h4{margin:0 0 .15rem; font-size:.92rem; font-weight:600;}
+  .schedule-item p{margin:0; font-size:.8rem; color:var(--muted);}
+
+  .ann-preview{display:flex; flex-direction:column; gap:.7rem;}
+  .ann-mini{border-left:3px solid var(--gold); padding:.15rem 0 .15rem .8rem;}
+  .ann-mini .tag{font-family:var(--font-mono); font-size:.62rem; color:var(--muted); letter-spacing:.06em; text-transform:uppercase;}
+  .ann-mini h4{margin:.15rem 0; font-size:.85rem; font-weight:600;}
+
+  .chip{display:inline-flex; align-items:center; gap:.4rem; border:1px solid var(--line); border-radius:999px; padding:.45rem .85rem; font-size:.8rem; background:#fff;}
+  .chip:hover{border-color:var(--blue-light); color:var(--blue-light);}
+
+  /* ---------- COURSES ---------- */
+  .tab-row{display:flex; gap:.45rem; flex-wrap:wrap; margin-bottom:1.6rem;}
+  .tab-btn{background:#fff; border:1px solid var(--line); border-radius:999px; padding:.55rem 1rem; font-size:.82rem; color:var(--muted); font-weight:500;}
+  .tab-btn.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+
+  .dept-panel{display:none; grid-template-columns:repeat(3,1fr); gap:1.15rem;}
+  .dept-panel.active{display:grid;}
+  @media (max-width:900px){ .dept-panel.active{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:600px){ .dept-panel.active{grid-template-columns:1fr;} }
+
+  .course-card{display:flex; flex-direction:column; gap:.75rem; position:relative; overflow:hidden; border-top:5px solid var(--blue);}
+  .course-card.featured{border-top-color:var(--gold);}
+  .course-card h3{margin:.2rem 0 0; font-size:1.08rem; font-family:var(--font-display); font-weight:600; color:var(--navy);}
+  .course-card .meta{font-size:.78rem; color:var(--muted);}
+  .progress{height:6px; background:var(--line); border-radius:3px; overflow:hidden;}
+  .progress span{display:block; height:100%; background:linear-gradient(90deg, var(--blue-light), var(--gold));}
+  .empty-note{grid-column:1/-1; border:1.5px dashed var(--line); border-radius:var(--radius); padding:2.2rem; text-align:center; color:var(--muted); font-size:.9rem; background:#fff;}
+
+  /* ---------- COURSE DETAIL ---------- */
+  .back-link{display:inline-flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--muted); background:none; border:none; margin-bottom:1rem; font-weight:500;}
+  .back-link:hover{color:var(--blue-light);}
+  .cd-head{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;}
+  .cd-tabs{display:flex; gap:1.5rem; border-bottom:1px solid var(--line); margin:1.7rem 0 1.4rem; overflow-x:auto;}
+  .cd-tab{background:none; border:none; padding:.15rem 0 .8rem; font-size:.85rem; color:var(--muted); border-bottom:3px solid transparent; margin-bottom:-1px; white-space:nowrap; font-weight:500;}
+  .cd-tab.active{color:var(--navy); border-color:var(--gold); font-weight:700;}
+  .cd-panel{display:none;}
+  .cd-panel.active{display:block;}
+
+  .accordion{border:1px solid var(--line); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:.65rem; background:#fff;}
+  .accordion-head{width:100%; background:#fff; border:none; padding:.95rem 1.15rem; display:flex; justify-content:space-between; align-items:center; font-size:.9rem; font-weight:600; color:var(--navy);}
+  .accordion-head .wk{font-family:var(--font-mono); color:var(--blue-light); margin-right:.6rem; font-size:.78rem; font-weight:500;}
+  .accordion-head .chevron{transition:transform .18s ease; color:var(--muted);}
+  .accordion.open .accordion-head .chevron{transform:rotate(90deg);}
+  .accordion.open .accordion-head{background:rgba(11,111,179,0.05);}
+  .accordion-body{max-height:0; overflow:hidden; transition:max-height .22s ease;}
+  .accordion.open .accordion-body{max-height:600px;}
+  .accordion-body-inner{padding:0 1.15rem 1.15rem; font-size:.85rem; color:var(--muted); line-height:1.6;}
+  .accordion-body-inner ul{margin:.4rem 0; padding-left:1.1rem;}
+  .link-row{display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.7rem;}
+
+  .res-table{width:100%; border-collapse:collapse; font-size:.85rem;}
+  .res-table th{text-align:left; font-family:var(--font-mono); font-size:.64rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:.55rem .4rem; border-bottom:1px solid var(--line);}
+  .res-table td{padding:.75rem .4rem; border-bottom:1px solid var(--line); vertical-align:middle;}
+  .res-table tr:last-child td{border-bottom:none;}
+  .file-name{display:flex; align-items:center; gap:.6rem; font-weight:600; color:var(--navy);}
+  .file-name .icon{color:var(--blue-light);}
+  .file-tag{font-family:var(--font-mono); font-size:.66rem; color:var(--blue); background:rgba(11,111,179,0.08); padding:.18rem .5rem; border-radius:999px;}
+
+  .thread{display:flex; justify-content:space-between; align-items:center; padding:.85rem 0; border-bottom:1px solid var(--line);}
+  .thread:last-child{border-bottom:none;}
+  .thread h4{margin:0 0 .2rem; font-size:.88rem; font-weight:600; color:var(--navy);}
+  .thread p{margin:0; font-size:.76rem; color:var(--muted);}
+  .thread .count{font-family:var(--font-mono); font-size:.75rem; color:var(--muted); white-space:nowrap;}
+
+  /* ---------- ANNOUNCEMENTS ---------- */
+  .ann-card{position:relative; padding-left:1.5rem;}
+  .ann-card::before{content:''; position:absolute; left:1.1rem; top:1.35rem; width:9px; height:9px; border-radius:50%; background:var(--gold);}
+  .ann-card h3{margin:.3rem 0 .3rem; font-size:1rem; color:var(--navy);}
+  .ann-card .meta-row{display:flex; gap:.6rem; align-items:center; font-family:var(--font-mono); font-size:.66rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;}
+  .ann-card p.body{color:var(--muted); font-size:.88rem; margin:.5rem 0 0; line-height:1.6;}
+  .pin{background:var(--navy); color:var(--gold-soft); font-family:var(--font-mono); font-size:.6rem; letter-spacing:.08em; padding:.18rem .5rem; border-radius:999px; font-weight:600;}
+
+  /* ---------- DISCUSSION ---------- */
+  .disc-cat{cursor:pointer; text-align:left;}
+  .disc-cat.active{border-color:var(--gold); box-shadow:0 0 0 3px rgba(245,179,53,.18);}
+  .disc-cat h4{margin:0 0 .25rem; font-size:.9rem; color:var(--navy);}
+  .disc-cat p{margin:0; font-size:.76rem; color:var(--muted);}
+  .thread-group{display:none;}
+  .thread-group.active{display:block;}
+
+  /* ---------- AI TUTOR ---------- */
+  .tutor-layout{display:grid; grid-template-columns:240px 1fr; gap:1.3rem;}
+  @media (max-width:800px){ .tutor-layout{grid-template-columns:1fr;} }
+  .prompt-chip{display:block; width:100%; text-align:left; margin-bottom:.55rem; font-size:.8rem; border-radius:var(--radius-sm);}
+  .chat-shell{display:flex; flex-direction:column; height:530px; padding:0; overflow:hidden;}
+  .chat-window{flex:1; overflow-y:auto; padding:1.1rem; display:flex; flex-direction:column; gap:.75rem; background:linear-gradient(180deg, #fbfcff, #fff);}
+  .msg{max-width:80%; padding:.7rem .95rem; border-radius:14px; font-size:.86rem; line-height:1.58;}
+  .msg.user{align-self:flex-end; background:var(--navy); color:#fff; border-bottom-right-radius:4px;}
+  .msg.ai{align-self:flex-start; background:#eef4fb; border:1px solid var(--line); border-bottom-left-radius:4px; color:var(--ink);}
+  .msg.typing{color:var(--muted); font-style:italic;}
+  .chat-input-row{display:flex; gap:.6rem; padding:.9rem; border-top:1px solid var(--line); background:#fff;}
+  .chat-input-row input{flex:1; border:1px solid var(--line); border-radius:999px; padding:.65rem .95rem; font-family:var(--font-body); font-size:.85rem; outline:none;}
+  .chat-input-row input:focus{border-color:var(--gold);}
+  .chat-input-row .btn{border-radius:50%; width:42px; height:42px; padding:0; justify-content:center;}
+
+  /* ---------- OFFICE HOURS ---------- */
+  .slot-grid{display:none; grid-template-columns:repeat(4,1fr); gap:.65rem;}
+  .slot-grid.active{display:grid;}
+  @media (max-width:700px){ .slot-grid.active{grid-template-columns:repeat(2,1fr);} }
+  .slot{border:1px solid var(--line); border-radius:var(--radius-sm); padding:.65rem; font-size:.78rem; background:#fff; font-family:var(--font-mono); text-align:center; font-weight:500;}
+  .slot:hover{border-color:var(--blue-light); color:var(--blue-light);}
+  .slot.booked{background:rgba(63,138,95,0.1); border-color:var(--green); color:var(--green); font-weight:700;}
+
+  /* ---------- CAREER ---------- */
+  .opp-card h4{margin:0 0 .2rem; font-size:.92rem; color:var(--navy);}
+  .opp-card .org{font-size:.78rem; color:var(--muted); margin-bottom:.6rem;}
+  .opp-card .deadline{font-family:var(--font-mono); font-size:.68rem; color:var(--blue); letter-spacing:.04em; background:rgba(11,111,179,.08); padding:.2rem .55rem; border-radius:999px; display:inline-block;}
+
+  /* ---------- PROFILE ---------- */
+  .profile-head{display:flex; gap:1.4rem; align-items:center;}
+  .avatar-lg{width:76px; height:76px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:1.7rem; font-weight:700; flex:none; border:3px solid var(--gold);}
+  .badge{display:flex; flex-direction:column; align-items:center; gap:.5rem; text-align:center; font-size:.75rem; color:var(--muted);}
+  .badge-icon{width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg, var(--gold), #ffd977); display:flex; align-items:center; justify-content:center; color:var(--navy);}
+
+  /* Footer bar */
+  .hub-footer{margin-top:auto; background:var(--navy); border-top:4px solid var(--gold); color:rgba(255,255,255,.75); padding:1.3rem 2.4rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:.6rem; font-size:.78rem;}
+  .hub-footer strong{color:#fff;}
+  .hub-footer .tag{font-family:var(--font-mono); font-size:.66rem; color:var(--gold-soft); letter-spacing:.06em;}
+
+  @media (max-width:880px){
+    .sidebar{position:fixed; left:-270px; transition:left .2s ease;}
+    .sidebar.open{left:0; box-shadow:0 0 0 100vmax rgba(4,10,20,.5);}
+    .menu-toggle{display:inline-flex;}
+    .search-box{display:none;}
+    .content{padding:1.5rem 1.2rem 2.2rem;}
+    .hero-inner{align-items:flex-start;}
+    .hub-footer{padding:1.1rem 1.2rem; flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5v-13ZM20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5c.8 0 1.5-.7 1.5-1.5v-13Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 10v4h3l6 4V6l-6 4H3ZM16 9a3 3 0 0 1 0 6M19 7a6 6 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v10H8l-4 4V5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><path d="M9 3v2M15 3v2M5 9h14v8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9ZM9 13v2M15 13v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-13ZM4 9h16M8 3v3M16 3v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-briefcase" viewBox="0 0 24 24"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h13A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9ZM9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M4 12h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 20c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14ZM20 20l-4.35-4.35" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.5 5 1.5 5h-15S6 14 6 10ZM10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0 4-4m-4 4-4-4M4 18h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5m0 0 6-6m-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12 20 4l-6 16-3-7-7-1Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4.5v15l14-7.5-14-7.5Z" fill="currentColor"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-scroll">
+      <div class="brand">
+        <div class="crest">CoET</div>
+        <div class="brand-text">
+          <h1>Engineering Hub</h1>
+          <p>University of Dar es Salaam</p>
+        </div>
+      </div>
+      <nav class="primary">
+        <div class="nav-group-label">Overview</div>
+        <button class="nav-btn active" data-view="home"><svg class="icon"><use href="#i-home"/></svg>Home</button>
+        <button class="nav-btn" data-view="courses"><svg class="icon"><use href="#i-book"/></svg>Courses</button>
+        <button class="nav-btn" data-view="announcements"><svg class="icon"><use href="#i-megaphone"/></svg>Announcements</button>
+
+        <div class="nav-group-label">Community</div>
+        <button class="nav-btn" data-view="discussion"><svg class="icon"><use href="#i-chat"/></svg>Discussion</button>
+        <button class="nav-btn" data-view="resources"><svg class="icon"><use href="#i-folder"/></svg>Resources</button>
+        <button class="nav-btn" data-view="ai-tutor"><svg class="icon"><use href="#i-bot"/></svg>AI Tutor</button>
+
+        <div class="nav-group-label">Support</div>
+        <button class="nav-btn" data-view="office-hours"><svg class="icon"><use href="#i-calendar"/></svg>Office Hours</button>
+        <button class="nav-btn" data-view="career"><svg class="icon"><use href="#i-briefcase"/></svg>Career Centre</button>
+        <button class="nav-btn" data-view="profile"><svg class="icon"><use href="#i-user"/></svg>Profile</button>
+      </nav>
+    </div>
+    <div class="sidebar-foot">
+      <strong>College of Engineering &amp; Technology</strong><br>
+      Dept. of Structural &amp; Construction Engineering (SCE)<br>
+      SC221 · SC222 · SC223
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-toggle" id="menuBtn"><svg class="icon"><use href="#i-menu"/></svg></button>
+      <span class="sheet-label" id="sheetLabel">HOME</span>
+      <div class="divider"></div>
+      <div class="search-box">
+        <svg class="icon"><use href="#i-search"/></svg>
+        <input type="text" placeholder="Search courses, files, discussions…">
+      </div>
+      <div class="topbar-right">
+        <div class="bell-wrap"><svg class="icon"><use href="#i-bell"/></svg><span class="bell-dot"></span></div>
+        <div class="avatar">AJ</div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ HOME ============ -->
+      <section class="view active" id="view-home" data-title="Home">
+        <div class="hero-band">
+          <div class="hero-inner">
+            <div>
+              <span class="hero-badge">University of Dar es Salaam · CoET · Dept. of SCE</span>
+              <h2>Welcome back, Amina.</h2>
+              <p class="lead">Course links, weekly updates, lecture materials, discussions, live sessions and support — one hub, instead of five apps.</p>
+            </div>
+            <div class="hero-stats">
+              <div class="hero-stat"><strong>3</strong><span>Courses</span></div>
+              <div class="hero-stat"><strong>24/7</strong><span>Access</span></div>
+              <div class="hero-stat"><strong>1</strong><span>Hub</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><div class="line"></div><span class="label">This week</span><div class="line right"></div></div>
+
+        <div class="grid grid-4">
+          <div class="card stat-card"><span class="label">Enrolled</span><span class="value">3</span><span class="sub">SCE · Year 3</span></div>
+          <div class="card stat-card"><span class="label">Unread</span><span class="value">5</span><span class="sub">Announcements</span></div>
+          <div class="card stat-card"><span class="label">Due soon</span><span class="value">2 days</span><span class="sub">Problem Set 4 — SC223</span></div>
+          <div class="card stat-card"><span class="label">Next live class</span><span class="value">2:00 PM</span><span class="sub">SC223 · Google Meet</span></div>
+        </div>
+
+        <div class="section-divider"><div class="line"></div><span class="label">Today's schedule</span><div class="line right"></div></div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="schedule-item"><span class="time-chip">10:00</span><div><h4>SC223 — Structural Analysis II</h4><p>Lecture · Room ENG-204 · Dr. Mwakalinga</p></div></div>
+            <div class="schedule-item"><span class="time-chip">14:00</span><div><h4>Office Hours</h4><p>Dr. Mwakalinga · Drop-in, 30 min slots</p></div></div>
+            <div class="schedule-item"><span class="time-chip">16:30</span><div><h4>SC221 — Mechanics of Materials</h4><p>Tutorial · Problem Set 3 review</p></div></div>
+          </div>
+
+          <div class="card">
+            <div class="ann-preview">
+              <div class="ann-mini"><span class="tag">SC223 · Today</span><h4>Problem Set 4 released</h4></div>
+              <div class="ann-mini"><span class="tag">SC221 · Yesterday</span><h4>Guest lecture: bridge design in practice</h4></div>
+              <div class="ann-mini"><span class="tag">SC222 · 2 days ago</span><h4>Office hours moved to Thursday</h4></div>
+            </div>
+            <div style="margin-top:1rem;"><button class="btn btn-ghost" data-view-jump="announcements">View all announcements</button></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><div class="line"></div><span class="label">Jump back in</span><div class="line right"></div></div>
+        <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+          <button class="chip" data-view-jump="courses"><span class="stamp" style="padding:.1rem .5rem; font-size:.66rem;">SC223</span> Structural Analysis II</button>
+          <button class="chip" data-view-jump="resources">Open resource library</button>
+          <button class="chip" data-view-jump="ai-tutor">Ask the AI Tutor</button>
+        </div>
+      </section>
+
+      <!-- ============ COURSES ============ -->
+      <section class="view" id="view-courses" data-title="Courses">
+        <p class="eyebrow">Departments · CoET</p>
+        <h2 class="view-title">Courses</h2>
+        <p class="view-sub">Starting with the Department of Structural &amp; Construction Engineering (SCE). Other CoET departments join as the hub rolls out.</p>
+
+        <div class="tab-row">
+          <button class="tab-btn dept-tab active" data-dept="sce">Structural &amp; Construction (SCE)</button>
+          <button class="tab-btn dept-tab" data-dept="ee">Electrical Engineering (EE)</button>
+          <button class="tab-btn dept-tab" data-dept="mie">Mechanical &amp; Industrial (MIE)</button>
+          <button class="tab-btn dept-tab" data-dept="wre">Water Resources (WRE)</button>
+          <button class="tab-btn dept-tab" data-dept="tge">Transportation &amp; Geotechnical (TGE)</button>
+          <button class="tab-btn dept-tab" data-dept="cpe">Chemical &amp; Process (CPE)</button>
+        </div>
+
+        <div class="dept-panel active" data-dept="sce">
+          <div class="card course-card">
+            <span class="stamp">SC221</span>
+            <h3>Mechanics of Materials</h3>
+            <div class="meta">Prof. Ndosi · 3 Credit Hours</div>
+            <div class="progress"><span style="width:64%"></span></div>
+            <div class="meta">64% complete</div>
+            <button class="btn btn-primary" style="align-self:flex-start;">Open course</button>
+          </div>
+          <div class="card course-card">
+            <span class="stamp">SC222</span>
+            <h3>Structural Analysis I</h3>
+            <div class="meta">Dr. Kileo · 3 Credit Hours</div>
+            <div class="progress"><span style="width:41%"></span></div>
+            <div class="meta">41% complete</div>
+            <button class="btn btn-primary" style="align-self:flex-start;">Open course</button>
+          </div>
+          <div class="card course-card featured">
+            <span class="stamp">SC223</span>
+            <h3>Structural Analysis II</h3>
+            <div class="meta">Dr. Mwakalinga · 4 Credit Hours</div>
+            <div class="progress"><span style="width:78%"></span></div>
+            <div class="meta">78% complete</div>
+            <button class="btn btn-accent" data-open-course style="align-self:flex-start;">Open course</button>
+          </div>
+        </div>
+
+        <div class="dept-panel" data-dept="ee"><div class="empty-note">Electrical Engineering course pages launch in Phase 2 of the rollout.</div></div>
+        <div class="dept-panel" data-dept="mie"><div class="empty-note">Mechanical &amp; Industrial Engineering course pages launch in Phase 2 of the rollout.</div></div>
+        <div class="dept-panel" data-dept="wre"><div class="empty-note">Water Resources Engineering course pages launch in Phase 2 of the rollout.</div></div>
+        <div class="dept-panel" data-dept="tge"><div class="empty-note">Transportation &amp; Geotechnical Engineering course pages launch in Phase 2 of the rollout.</div></div>
+        <div class="dept-panel" data-dept="cpe"><div class="empty-note">Chemical &amp; Process Engineering course pages launch in Phase 2 of the rollout.</div></div>
+      </section>
+
+      <!-- ============ COURSE DETAIL (SC223) ============ -->
+      <section class="view" id="view-course-detail" data-title="SC223">
+        <button class="back-link" data-back="courses"><svg class="icon"><use href="#i-back"/></svg>Back to courses</button>
+        <div class="cd-head">
+          <div>
+            <span class="stamp">SC223</span>
+            <h2 class="view-title" style="margin-top:.6rem;">Structural Analysis II</h2>
+            <p class="view-sub">Dr. Mwakalinga · Dept. of Structural &amp; Construction Engineering · 4 Credit Hours · Semester 2</p>
+          </div>
+          <button class="btn btn-accent"><svg class="icon"><use href="#i-play"/></svg>Join live class</button>
+        </div>
+
+        <div class="cd-tabs">
+          <button class="cd-tab active" data-panel="overview">Overview</button>
+          <button class="cd-tab" data-panel="modules">Weekly Modules</button>
+          <button class="cd-tab" data-panel="resources">Resources</button>
+          <button class="cd-tab" data-panel="discussion">Discussion</button>
+        </div>
+
+        <div class="cd-panel active" data-panel="overview">
+          <div class="grid grid-2">
+            <div class="card">
+              <h4 style="margin-top:0; color:var(--navy);">About this course</h4>
+              <p style="color:var(--muted); font-size:.9rem;">Builds on SC222 to cover indeterminate structures, deflection methods, and an introduction to matrix stiffness analysis, with weekly problem sets tied to real structural design cases.</p>
+              <h4 style="color:var(--navy);">Learning outcomes</h4>
+              <ul style="color:var(--muted); font-size:.9rem; padding-left:1.1rem; margin:0;">
+                <li>Analyse statically indeterminate beams and frames</li>
+                <li>Apply force and displacement methods to solve structures</li>
+                <li>Use strain energy methods, including Castigliano's theorem</li>
+                <li>Interpret results against real design codes</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4 style="margin-top:0; color:var(--navy);">Grading breakdown</h4>
+              <div class="schedule-item"><span class="time-chip">40%</span><div><h4>Final Examination</h4></div></div>
+              <div class="schedule-item"><span class="time-chip">25%</span><div><h4>Midterm Test</h4></div></div>
+              <div class="schedule-item"><span class="time-chip">20%</span><div><h4>Problem Sets (weekly)</h4></div></div>
+              <div class="schedule-item"><span class="time-chip">15%</span><div><h4>Lab &amp; Design Project</h4></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cd-panel" data-panel="modules">
+          <div class="accordion"><button class="accordion-head"><span><span class="wk">WK 01</span>Introduction to Indeterminate Structures</span><svg class="icon chevron"><use href="#i-chevron"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">Degree of indeterminacy, compatibility conditions, and where the force method is headed this semester.</div></div></div>
+          <div class="accordion"><button class="accordion-head"><span><span class="wk">WK 02</span>Force Method — Beams</span><svg class="icon chevron"><use href="#i-chevron"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">Redundant selection, primary structures, and compatibility equations for propped and fixed beams.</div></div></div>
+          <div class="accordion"><button class="accordion-head"><span><span class="wk">WK 03</span>Force Method — Frames</span><svg class="icon chevron"><use href="#i-chevron"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">Extending the force method to rigid frames with multiple redundants.</div></div></div>
+          <div class="accordion"><button class="accordion-head"><span><span class="wk">WK 04</span>Slope-Deflection Method</span><svg class="icon chevron"><use href="#i-chevron"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">Deriving slope-deflection equations and applying them to continuous beams.</div></div></div>
+          <div class="accordion"><button class="accordion-head"><span><span class="wk">WK 05</span>Moment Distribution</span><svg class="icon chevron"><use href="#i-chevron"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">Distribution factors, carry-over, and iterative balancing for frames and beams.</div></div></div>
+          <div class="accordion open"><button class="accordion-head"><span><span class="wk">WK 06</span>Strain Energy &amp; Castigliano's Theorem</span><svg class="icon chevron"><use href="#i-chevron"/></svg></button>
+            <div class="accordion-body"><div class="accordion-body-inner">
+              <strong style="color:var(--navy);">Learning objectives</strong>
+              <ul>
+                <li>Compute strain energy for axial, bending, and torsional members</li>
+                <li>Apply Castigliano's theorem to find deflections</li>
+                <li>Use the unit-load method as a cross-check</li>
+              </ul>
+              <strong style="color:var(--navy);">Reflection</strong> — Where else in structural design have you seen an energy-based method used instead of a force-balance method?
+              <div class="link-row">
+                <span class="chip">Lecture notes (PDF)</span>
+                <span class="chip">Recorded lecture</span>
+                <span class="chip">Week 6 quiz</span>
+                <span class="chip">Homework set</span>
+              </div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="cd-panel" data-panel="resources">
+          <table class="res-table">
+            <thead><tr><th>File</th><th>Type</th><th>Size</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>SC223 Lecture Notes — Weeks 1–6</div></td><td><span class="file-tag">PDF</span></td><td>4.2 MB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Indeterminate Structures — Reference Text</div></td><td><span class="file-tag">PDF</span></td><td>11.8 MB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Past Papers — 2022–2025</div></td><td><span class="file-tag">ZIP</span></td><td>2.1 MB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Moment Distribution Spreadsheet Tool</div></td><td><span class="file-tag">XLSX</span></td><td>340 KB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cd-panel" data-panel="discussion">
+          <div class="thread"><div><h4>Clarification on Week 6 homework Q3</h4><p>Started by a classmate · SC223</p></div><span class="count">6 replies</span></div>
+          <div class="thread"><div><h4>Sign convention for slope-deflection</h4><p>Pinned by Dr. Mwakalinga</p></div><span class="count">14 replies</span></div>
+          <div class="thread"><div><h4>Lab report formatting question</h4><p>Started by a classmate · SC223</p></div><span class="count">3 replies</span></div>
+        </div>
+      </section>
+
+      <!-- ============ ANNOUNCEMENTS ============ -->
+      <section class="view" id="view-announcements" data-title="Announcements">
+        <p class="eyebrow">Notice board</p>
+        <h2 class="view-title">Announcements</h2>
+        <p class="view-sub">Everything posted across your enrolled courses, newest first.</p>
+
+        <div class="section-divider"><div class="line"></div><span class="label">Latest</span><div class="line right"></div></div>
+
+        <div class="grid" style="grid-template-columns:1fr; gap:.9rem;">
+          <div class="card ann-card">
+            <div class="meta-row"><span class="pin">Pinned</span><span>SC223 · Today</span></div>
+            <h3>Problem Set 4 released</h3>
+            <p class="body">Covers strain energy and Castigliano's theorem. Due Friday, 11:59 PM — submit through the course resources page.</p>
+          </div>
+          <div class="card ann-card">
+            <div class="meta-row"><span>SC221 · Yesterday</span></div>
+            <h3>Guest lecture: bridge design in practice</h3>
+            <p class="body">A practising structural engineer joins Thursday's session to walk through a real bridge retrofit project. Attendance counts toward participation.</p>
+          </div>
+          <div class="card ann-card">
+            <div class="meta-row"><span>SC222 · 2 days ago</span></div>
+            <h3>Office hours moved to Thursday</h3>
+            <p class="body">Dr. Kileo's office hours move from Wednesday to Thursday, 2:00–3:30 PM, for the rest of the semester.</p>
+          </div>
+          <div class="card ann-card">
+            <div class="meta-row"><span>SC223 · 3 days ago</span></div>
+            <h3>Midterm marks posted</h3>
+            <p class="body">Marks and feedback are up in the gradebook. Bring questions to office hours before Friday.</p>
+          </div>
+          <div class="card ann-card">
+            <div class="meta-row"><span>General · 5 days ago</span></div>
+            <h3>Library extended hours during exam period</h3>
+            <p class="body">The main engineering library stays open until midnight starting next Monday, through the end of exams.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DISCUSSION ============ -->
+      <section class="view" id="view-discussion" data-title="Discussion">
+        <p class="eyebrow">Community</p>
+        <h2 class="view-title">Discussion</h2>
+        <p class="view-sub">Organised by topic instead of one long chat, so questions stay easy to find later.</p>
+
+        <div class="grid grid-4" style="margin-bottom:1.5rem;">
+          <div class="card disc-cat active" data-cat="week6"><h4>Week 6</h4><p>23 threads · active today</p></div>
+          <div class="card disc-cat" data-cat="assignments"><h4>Assignments</h4><p>41 threads · active today</p></div>
+          <div class="card disc-cat" data-cat="lab"><h4>Laboratory</h4><p>12 threads · active yesterday</p></div>
+          <div class="card disc-cat" data-cat="software"><h4>Software Help</h4><p>9 threads · active 2 days ago</p></div>
+          <div class="card disc-cat" data-cat="general"><h4>General Questions</h4><p>17 threads · active today</p></div>
+          <div class="card disc-cat" data-cat="exam"><h4>Exam Revision</h4><p>28 threads · active today</p></div>
+          <div class="card disc-cat" data-cat="week1"><h4>Week 1–5 Archive</h4><p>64 threads · read-only</p></div>
+          <div class="card disc-cat" data-cat="announcements"><h4>Announcements</h4><p>Instructor posts only</p></div>
+        </div>
+
+        <div class="card">
+          <div class="thread-group active" data-cat="week6">
+            <div class="thread"><div><h4>How is the redundant force chosen for a two-span beam?</h4><p>SC223 · Week 6</p></div><span class="count">6 replies</span></div>
+            <div class="thread"><div><h4>Castigliano's theorem — partial derivative confusion</h4><p>SC223 · Week 6</p></div><span class="count">11 replies</span></div>
+            <div class="thread"><div><h4>Unit-load method as a cross-check — worked example?</h4><p>SC223 · Week 6</p></div><span class="count">4 replies</span></div>
+          </div>
+          <div class="thread-group" data-cat="assignments">
+            <div class="thread"><div><h4>Problem Set 4 — is Q2 asking for principal stresses too?</h4><p>SC223</p></div><span class="count">9 replies</span></div>
+            <div class="thread"><div><h4>Late submission policy for Problem Set 3</h4><p>SC221</p></div><span class="count">5 replies</span></div>
+          </div>
+          <div class="thread-group" data-cat="lab">
+            <div class="thread"><div><h4>Lab report formatting question</h4><p>SC223</p></div><span class="count">3 replies</span></div>
+            <div class="thread"><div><h4>Strain gauge calibration — what went wrong?</h4><p>SC221</p></div><span class="count">7 replies</span></div>
+          </div>
+          <div class="thread-group" data-cat="software">
+            <div class="thread"><div><h4>Moment distribution spreadsheet won't open on Mac</h4><p>SC223</p></div><span class="count">2 replies</span></div>
+          </div>
+          <div class="thread-group" data-cat="general">
+            <div class="thread"><div><h4>Best reference text for structural dynamics next semester?</h4><p>General</p></div><span class="count">14 replies</span></div>
+          </div>
+          <div class="thread-group" data-cat="exam">
+            <div class="thread"><div><h4>Midterm topic list — is torsion included?</h4><p>SC223</p></div><span class="count">18 replies</span></div>
+          </div>
+          <div class="thread-group" data-cat="week1">
+            <div class="thread"><div><h4>Week 1–5 threads are archived and searchable</h4><p>Read-only</p></div><span class="count">64 threads</span></div>
+          </div>
+          <div class="thread-group" data-cat="announcements">
+            <div class="thread"><div><h4>Only instructors can start threads here</h4><p>Announcements</p></div><span class="count">—</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RESOURCES ============ -->
+      <section class="view" id="view-resources" data-title="Resources">
+        <p class="eyebrow">Library</p>
+        <h2 class="view-title">Resources</h2>
+        <p class="view-sub">Lecture notes, texts, past papers, and tools — organised by type, across every course you're enrolled in.</p>
+
+        <div class="section-divider"><div class="line"></div><span class="label">All files</span><div class="line right"></div></div>
+
+        <table class="res-table">
+          <thead><tr><th>File</th><th>Course</th><th>Type</th><th>Size</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Lecture Notes — Weeks 1–6</div></td><td>SC223</td><td><span class="file-tag">PDF</span></td><td>4.2 MB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+            <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Mechanics of Materials — Course Text</div></td><td>SC221</td><td><span class="file-tag">PDF</span></td><td>18.4 MB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+            <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Past Papers — 2022–2025</div></td><td>SC223</td><td><span class="file-tag">ZIP</span></td><td>2.1 MB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+            <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Structural Analysis I — Tutorial Videos</div></td><td>SC222</td><td><span class="file-tag">MP4</span></td><td>—</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+            <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Moment Distribution Spreadsheet Tool</div></td><td>SC223</td><td><span class="file-tag">XLSX</span></td><td>340 KB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+            <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Problem Set 3 — Model Solutions</div></td><td>SC221</td><td><span class="file-tag">PDF</span></td><td>1.6 MB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+            <tr><td><div class="file-name"><svg class="icon"><use href="#i-folder"/></svg>Design Project Brief &amp; Rubric</div></td><td>SC223</td><td><span class="file-tag">DOCX</span></td><td>220 KB</td><td><button class="btn btn-ghost"><svg class="icon"><use href="#i-download"/></svg></button></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============ AI TUTOR ============ -->
+      <section class="view" id="view-ai-tutor" data-title="AI Tutor">
+        <p class="eyebrow">Always available</p>
+        <h2 class="view-title">AI Tutor</h2>
+        <p class="view-sub">A first pass at explaining a concept before office hours — not a replacement for your instructor.</p>
+
+        <div class="tutor-layout" style="margin-top:1.6rem;">
+          <div>
+            <p style="font-family:var(--font-mono); font-size:.66rem; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; margin-bottom:.6rem;">Try asking</p>
+            <button class="btn btn-ghost prompt-chip">Explain Mohr's Circle</button>
+            <button class="btn btn-ghost prompt-chip">Derive the torsion equation for a circular shaft</button>
+            <button class="btn btn-ghost prompt-chip">What is strain energy?</button>
+            <button class="btn btn-ghost prompt-chip">Determinate vs indeterminate structures</button>
+          </div>
+
+          <div class="card chat-shell">
+            <div class="chat-window" id="chatWindow">
+              <div class="msg ai">Ask about anything from SC221–SC223 — start with a question on the left, or type your own below.</div>
+            </div>
+            <form class="chat-input-row" id="tutorForm">
+              <input type="text" id="tutorInput" placeholder="Type your question…" autocomplete="off">
+              <button class="btn btn-accent" type="submit"><svg class="icon"><use href="#i-send"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ OFFICE HOURS ============ -->
+      <section class="view" id="view-office-hours" data-title="Office Hours">
+        <p class="eyebrow">Book time</p>
+        <h2 class="view-title">Office Hours</h2>
+        <p class="view-sub">Pick an instructor and a slot. Booking here holds your place — no more waiting outside a door.</p>
+
+        <div class="tab-row">
+          <button class="tab-btn instructor-tab active" data-instructor="mwakalinga">Dr. Mwakalinga · SC223</button>
+          <button class="tab-btn instructor-tab" data-instructor="kileo">Dr. Kileo · SC222</button>
+          <button class="tab-btn instructor-tab" data-instructor="ndosi">Prof. Ndosi · SC221</button>
+        </div>
+
+        <div class="card">
+          <p style="font-family:var(--font-mono); font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:0;">Thursday, 30-minute slots</p>
+          <div class="slot-grid active" data-instructor="mwakalinga">
+            <button class="slot">14:00</button>
+            <button class="slot booked">Booked ✓</button>
+            <button class="slot">15:00</button>
+            <button class="slot">15:30</button>
+          </div>
+          <div class="slot-grid" data-instructor="kileo">
+            <button class="slot">13:00</button>
+            <button class="slot">13:30</button>
+            <button class="slot">14:00</button>
+            <button class="slot">14:30</button>
+          </div>
+          <div class="slot-grid" data-instructor="ndosi">
+            <button class="slot">10:00</button>
+            <button class="slot">10:30</button>
+            <button class="slot">11:00</button>
+            <button class="slot">11:30</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CAREER CENTRE ============ -->
+      <section class="view" id="view-career" data-title="Career Centre">
+        <p class="eyebrow">Beyond the classroom</p>
+        <h2 class="view-title">Career Centre</h2>
+        <p class="view-sub">Internships, scholarships, and research opportunities relevant to engineering students, in one feed.</p>
+
+        <div class="section-divider"><div class="line"></div><span class="label">Internships</span><div class="line right"></div></div>
+        <div class="grid grid-3">
+          <div class="card opp-card"><h4>Structural Engineering Intern</h4><div class="org">Regional Infrastructure Consultants</div><div class="deadline">Apply by 28 Jul</div></div>
+          <div class="card opp-card"><h4>Site Engineering Placement</h4><div class="org">National Roads Authority</div><div class="deadline">Apply by 15 Aug</div></div>
+          <div class="card opp-card"><h4>Materials Testing Intern</h4><div class="org">CoET Structures Laboratory</div><div class="deadline">Rolling</div></div>
+        </div>
+
+        <div class="section-divider"><div class="line"></div><span class="label">Scholarships &amp; research</span><div class="line right"></div></div>
+        <div class="grid grid-3">
+          <div class="card opp-card"><h4>Postgraduate Research Scholarship</h4><div class="org">CoET Graduate School</div><div class="deadline">Apply by 1 Sep</div></div>
+          <div class="card opp-card"><h4>Undergraduate Research Assistant</h4><div class="org">Structural Dynamics Research Group</div><div class="deadline">Apply by 10 Aug</div></div>
+          <div class="card opp-card"><h4>Bridge Design Competition</h4><div class="org">East Africa Student Engineers Network</div><div class="deadline">Team registration by 20 Jul</div></div>
+        </div>
+      </section>
+
+      <!-- ============ PROFILE ============ -->
+      <section class="view" id="view-profile" data-title="Profile">
+        <p class="eyebrow">Your account</p>
+        <h2 class="view-title">Profile</h2>
+
+        <div class="card" style="margin-top:1.6rem;">
+          <div class="profile-head">
+            <div class="avatar-lg">AJ</div>
+            <div>
+              <h3 style="margin:0; font-family:var(--font-display); color:var(--navy);">Amina Joseph</h3>
+              <p style="margin:.2rem 0 0; color:var(--muted); font-size:.85rem;">Structural &amp; Construction Engineering · Year 3 · Reg. No. CE/2023/0142</p>
+            </div>
+          </div>
+
+          <div class="section-divider"><div class="line"></div><span class="label">Enrolled courses</span><div class="line right"></div></div>
+          <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+            <span class="chip">SC221 — Mechanics of Materials</span>
+            <span class="chip">SC222 — Structural Analysis I</span>
+            <span class="chip">SC223 — Structural Analysis II</span>
+          </div>
+
+          <div class="section-divider"><div class="line"></div><span class="label">Badges &amp; achievements</span><div class="line right"></div></div>
+          <div style="display:flex; gap:1.3rem; flex-wrap:wrap;">
+            <div class="badge"><div class="badge-icon"><svg class="icon"><use href="#i-chat"/></svg></div>Top Discussion Contributor</div>
+            <div class="badge"><div class="badge-icon"><svg class="icon"><use href="#i-calendar"/></svg></div>Perfect Attendance</div>
+            <div class="badge"><div class="badge-icon"><svg class="icon"><use href="#i-book"/></svg></div>Problem Set Streak — 6 weeks</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="hub-footer">
+      <div><strong>CoET Engineering Hub</strong><br>University of Dar es Salaam · College of Engineering and Technology · Dept. of Structural &amp; Construction Engineering (SCE)</div>
+      <span class="tag">PILOT PHASE 01 — SC221 · SC222 · SC223</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const views = document.querySelectorAll('.view');
+  const navButtons = document.querySelectorAll('.nav-btn');
+  const sheetLabel = document.getElementById('sheetLabel');
+  const sidebar = document.getElementById('sidebar');
+
+  function closeMobileNav(){ sidebar.classList.remove('open'); }
+
+  function showView(name){
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    const activeView = document.getElementById('view-' + name);
+    const title = activeView ? (activeView.dataset.title || name) : name;
+    sheetLabel.textContent = title.toUpperCase();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    closeMobileNav();
+  }
+
+  navButtons.forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+  document.querySelectorAll('[data-view-jump]').forEach(b => b.addEventListener('click', () => showView(b.dataset.viewJump)));
+  document.querySelectorAll('[data-open-course]').forEach(b => b.addEventListener('click', () => showView('course-detail')));
+  document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => showView(b.dataset.back)));
+
+  // Accordion (weekly modules)
+  document.querySelectorAll('.accordion-head').forEach(h => {
+    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+  });
+
+  // Discussion categories
+  document.querySelectorAll('.disc-cat').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.disc-cat').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      document.querySelectorAll('.thread-group').forEach(g => g.classList.toggle('active', g.dataset.cat === c.dataset.cat));
+    });
+  });
+
+  // Office hours booking
+  document.querySelectorAll('.slot').forEach(s => {
+    s.addEventListener('click', () => {
+      if (s.classList.contains('booked')) return;
+      s.classList.add('booked');
+      s.textContent = 'Booked ✓';
+    });
+  });
+
+  // Instructor tabs
+  document.querySelectorAll('.instructor-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.instructor-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('.slot-grid').forEach(g => g.classList.toggle('active', g.dataset.instructor === t.dataset.instructor));
+    });
+  });
+
+  // Department tabs
+  document.querySelectorAll('.dept-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.dept-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('.dept-panel').forEach(p => p.classList.toggle('active', p.dataset.dept === t.dataset.dept));
+    });
+  });
+
+  // Course detail tabs
+  document.querySelectorAll('.cd-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.cd-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('.cd-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === t.dataset.panel));
+    });
+  });
+
+  // AI Tutor
+  const tutorAnswers = {
+    mohr: "Mohr's Circle is a graphical way to find the normal and shear stress on a plane at any angle, once you know the stress state on the original x-y planes. Plot the points (σx, τxy) and (σy, −τxy), draw a circle through them centred on the average normal stress, and every point on that circle represents a stress pair on some rotated plane. The circle's radius is the maximum in-plane shear stress, and where it crosses the horizontal axis gives the two principal stresses.",
+    torsion: "For a circular shaft in pure torsion, shear strain grows linearly with radius, so shear stress does too: τ = T·r / J, where T is the applied torque, r is distance from the shaft's axis, and J is the polar moment of inertia. Integrating the moment produced by that stress distribution across the whole cross-section, then setting it equal to T, is how J = π·d⁴/32 for a solid shaft falls out in the first place.",
+    strain: "Strain energy is the elastic energy a member stores while it deforms, equal to the area under its load–deflection curve. For simple axial loading that works out to U = P²L / (2AE), and for bending it's the integral of M²/(2EI) along the beam's length. It's most useful in methods like Castigliano's theorem, where taking a derivative of total strain energy with respect to a load gives the deflection at that load's point of application.",
+    determinate: "A structure is statically determinate when the equations of equilibrium alone are enough to find every reaction and internal force — reactions match equations, with nothing left over. An indeterminate structure has more unknowns than equilibrium can solve, so extra compatibility conditions describing how it actually deforms are needed to close the gap. Most real buildings are indeterminate on purpose — the redundancy gives load an alternate path if one member is damaged."
+  };
+
+  function matchTopic(q){
+    q = q.toLowerCase();
+    if (q.includes('mohr')) return 'mohr';
+    if (q.includes('torsion') || q.includes('torque') || q.includes('shaft')) return 'torsion';
+    if (q.includes('strain energy') || q.includes('castigliano')) return 'strain';
+    if (q.includes('determinate')) return 'determinate';
+    return null;
+  }
+
+  function appendMsg(role, text){
+    const wrap = document.getElementById('chatWindow');
+    const el = document.createElement('div');
+    el.className = 'msg ' + role;
+    el.textContent = text;
+    wrap.appendChild(el);
+    wrap.scrollTop = wrap.scrollHeight;
+    return el;
+  }
+
+  function askTutor(question){
+    appendMsg('user', question);
+    const typing = appendMsg('ai', 'thinking…');
+    typing.classList.add('typing');
+    setTimeout(() => {
+      typing.remove();
+      const key = matchTopic(question);
+      const answer = key ? tutorAnswers[key] : "That's outside today's sample topics — try one of the questions above, bring it to office hours, or post it in the SC223 discussion board and your instructor will pick it up.";
+      appendMsg('ai', answer);
+    }, 650);
+  }
+
+  document.querySelectorAll('.prompt-chip').forEach(c => {
+    c.addEventListener('click', () => askTutor(c.textContent.trim()));
+  });
+
+  document.getElementById('tutorForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('tutorInput');
+    const val = input.value.trim();
+    if (!val) return;
+    askTutor(val);
+    input.value = '';
+  });
+
+  // Mobile nav
+  document.getElementById('menuBtn').addEventListener('click', () => sidebar.classList.toggle('open'));
+
+  showView('home');
+</script>
+
+</body>
+</html>
